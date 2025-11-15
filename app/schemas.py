@@ -1,11 +1,16 @@
-from pydantic import BaseModel, Field, condecimal, field_validator, ConfigDict
-from typing import Optional
+from pydantic import BaseModel, Field, condecimal, validator
+from typing import Optional, Dict, Any
 from uuid import UUID
 from decimal import Decimal
 from datetime import datetime
 
 class LoanOut(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
+    class Config:
+        orm_mode = True
+        from_attributes = True
+        json_encoders = {
+            Decimal: lambda v: str(v)
+        }
 
     id: UUID
     borrower_id: str
@@ -18,13 +23,12 @@ class LoanOut(BaseModel):
     updated_at: Optional[datetime] = None
 
 class CreateLoanRequest(BaseModel):
-    borrower_id: str = Field(min_length=1)
+    borrower_id: str = Field(..., min_length=1)
     amount: condecimal(gt=0, le=50000, max_digits=12, decimal_places=2)
-    currency: str = Field(min_length=3, max_length=3)
+    currency: str = Field(..., min_length=3, max_length=3)
     term_months: Optional[int] = Field(default=None, ge=1)
     interest_rate_apr: Optional[condecimal(ge=0, le=100, max_digits=5, decimal_places=2)] = None
 
-    @field_validator("currency")
-    @classmethod
+    @validator("currency")
     def currency_upper(cls, v: str) -> str:
         return v.upper()

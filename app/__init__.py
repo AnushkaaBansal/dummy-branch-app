@@ -1,18 +1,25 @@
-from flask import Flask
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
-from .config import Config
-
-def create_app() -> Flask:
-    app = Flask(__name__)
-    app.config.from_object(Config())
-
-    # Lazy imports to avoid circular deps during app init
-    from .routes.health import bp as health_bp
-    from .routes.loans import bp as loans_bp
-    from .routes.stats import bp as stats_bp
-
-    app.register_blueprint(health_bp)
-    app.register_blueprint(loans_bp, url_prefix="/api")
-    app.register_blueprint(stats_bp, url_prefix="/api")
-
+def create_app() -> FastAPI:
+    app = FastAPI(title="Microloans API", version="1.0.0")
+    
+    # CORS middleware
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+    
+    # Import and include routers
+    from .routes.health import router as health_router
+    from .routes.loans import router as loans_router
+    from .routes.stats import router as stats_router
+    
+    app.include_router(health_router)
+    app.include_router(loans_router, prefix="/api", tags=["loans"])
+    app.include_router(stats_router, prefix="/api", tags=["stats"])
+    
     return app
