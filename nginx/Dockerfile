@@ -1,17 +1,19 @@
 FROM nginx:alpine
 
-# Remove default nginx config
-RUN rm /etc/nginx/conf.d/default.conf
+# Remove default configuration
+RUN rm -f /etc/nginx/conf.d/default.conf
 
-# Copy custom nginx config
-COPY nginx.conf /etc/nginx/nginx.conf
+# Install wget for health checks
+RUN apk add --no-cache wget
 
-# Copy SSL certificates
-COPY ssl/ /etc/nginx/ssl/
+# Create log directory
+RUN mkdir -p /var/log/nginx/app \
+    && touch /var/log/nginx/app/access.log \
+    && touch /var/log/nginx/app/error.log \
+    && chown -R nginx:nginx /var/log/nginx/app
 
-# Expose ports
+# Expose port 80
 EXPOSE 80
-EXPOSE 443
 
 # Start Nginx
 CMD ["nginx", "-g", "daemon off;"]

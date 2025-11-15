@@ -2,15 +2,20 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, develop ]
+    tags: [ 'v*' ]
   pull_request:
-    branches: [ main ]
+    branches: [ main, develop ]
 
 env:
   IMAGE_NAME: branch-loans-api
   CONTAINER_REGISTRY: ghcr.io
-  REGISTRY_USERNAME: ${{ github.actor }}
-  REGISTRY_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+  REGISTRY_NAMESPACE: ${{ github.repository_owner }}
+  VERSION: ${{ github.sha }}
+  
+  # Default environment variables for testing
+  DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_db
+  ENVIRONMENT: test
 
 jobs:
   test:
@@ -19,7 +24,7 @@ jobs:
     
     services:
       postgres:
-        image: postgres:16
+        image: postgres:16-alpine
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
@@ -45,17 +50,29 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
-        pip install pytest pytest-cov
+        pip install pytest pytest-cov black isort flake8
+
+    - name: Lint with flake8
+      run: |
+        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+        flake8 . --count --max-complexity=10 --max-line-length=127 --statistics
+
+    - name: Format with black
+      run: |
+        black --check .
 
     - name: Run tests
       env:
-        DATABASE_URL: postgresql+psycopg2://postgres:postgres@localhost:5432/test_db
+        DATABASE_URL: ${{ env.DATABASE_URL }}
+        ENVIRONMENT: test
       run: |
-        pytest --cov=app --cov-report=xml
+        pytest --cov=app --cov-report=xml:coverage.xml tests/
 
     - name: Upload coverage to Codecov
+      if: github.event_name == 'push'
       uses: codecov/codecov-action@v3
       with:
+        token: ${{ secrets.CODECOV_TOKEN }}
         file: ./coverage.xml
         fail_ci_if_error: false
 
@@ -63,11 +80,99 @@ jobs:
     name: Build and Push
     needs: test
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
+    
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
+    
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+    
+    - name: Log in to GitHub Container Registry
+      uses: docker/login-action@v2
+      with:
+        registry: ${{ env.CONTAINER_REGISTRY }}
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: Extract metadata (tags, labels) for Docker
+      id: meta
+      uses: docker/metadata-action@v4
+      with:
+        images: ${{ env.CONTAINER_REGISTRY }}/${{ env.REGISTRY_NAMESPACE }}/${{ env.IMAGE_NAME }}
+        tags: |
+          type=sha,format=long
+          type=ref,event=branch
+          type=ref,event=pr
+          type=semver,pattern={{version}}
+          type=semver,pattern={{major}}.{{minor}}
+          type=sha,prefix=sha-
+    
+    - name: Build and push Docker image
+      uses: docker/build-push-action@v4
+      with:
+        context: .
+        push: ${{ github.event_name != 'pull_request' }}
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+    
+    - name: Run Trivy vulnerability scanner
+      uses: aquasecurity/trivy-action@master
+      with:
+        image-ref: ${{ env.CONTAINER_REGISTRY }}/${{ env.REGISTRY_NAMESPACE }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+        format: 'sarif'
+        output: 'trivy-results.sarif'
+        severity: 'CRITICAL,HIGH'
+        exit-code: '1'
+        ignore-unfixed: true
+        vuln-type: 'os,library'
+    
+    - name: Upload Trivy scan results to GitHub Security tab
+      uses: github/codeql-action/upload-sarif@v2
+      with:
+        sarif_file: 'trivy-results.sarif'
+    
+    - name: Deploy to staging
+      if: github.ref == 'refs/heads/main'
+      run: |
+        echo "Deployment to staging would happen here"
+        # Add your deployment commands here
+        # Example: kubectl apply -f k8s/staging/
+    
+    - name: Deploy to Staging
+      if: github.ref == 'refs/heads/main'
+      uses: appleboy/ssh-action@v1.0.0
+      with:
+        host: ${{ secrets.STAGING_HOST }}
+        username: ${{ secrets.STAGING_USERNAME }}
+        key: ${{ secrets.STAGING_SSH_KEY }}
+        script: |
+          cd /opt/branch-loans
+          git fetch origin main
+          git reset --hard origin/main
+          export $(cat .env.staging | xargs)
+          docker compose -f docker-compose.yml -f docker-compose.staging.yml pull
+          docker compose -f docker-compose.yml -f docker-compose.staging.yml up -d --build
+          docker system prune -f
+
+    - name: Deploy to Production
+      if: startsWith(github.ref, 'refs/tags/v')
+      uses: appleboy/ssh-action@v1.0.0
+      with:
+        host: ${{ secrets.PROD_HOST }}
+        username: ${{ secrets.PROD_USERNAME }}
+        key: ${{ secrets.PROD_SSH_KEY }}
+        script: |
+          cd /opt/branch-loans
+          git fetch --tags
+          git checkout ${{ github.ref_name }}
+          export $(cat .env.prod | xargs)
+          docker compose -f docker-compose.yml -f docker-compose.prod.yml pull
+          docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+          docker system prune -f
 
     - name: Login to GitHub Container Registry
       uses: docker/login-action@v3

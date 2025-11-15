@@ -11,7 +11,7 @@ services:
       resources:
         limits:
           cpus: '1'
-          memory: 1G
+          memory: 2G
     restart: unless-stopped
 
   db:
@@ -25,7 +25,7 @@ services:
       resources:
         limits:
           cpus: '1'
-          memory: 2G
+          memory: 3G
     restart: unless-stopped
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-microloans}"]
@@ -35,8 +35,8 @@ services:
 
   nginx:
     ports:
-      - "80:80"
-      - "443:443"
+      - "8080:80"
+      - "8443:443"
     restart: unless-stopped
     depends_on:
       - api
