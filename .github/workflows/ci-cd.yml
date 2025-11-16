@@ -97,7 +97,7 @@ jobs:
 
     - name: Install test dependencies
       run: |
-        pip install pytest pytest-cov
+        pip install pytest pytest-cov fastapi uvicorn httpx sqlalchemy alembic python-multipart pydantic-settings
 
     - name: Run tests
       env:
