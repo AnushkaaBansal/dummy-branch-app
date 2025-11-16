@@ -8,15 +8,16 @@ packages = [{include = "app"}]
 
 [tool.poetry.dependencies]
 python = "^3.9,<3.12"
-fastapi = "^0.100.0"
-uvicorn = {extras = ["standard"], version = "^0.23.2"}
+# Using the latest FastAPI version that's compatible with starlette>=0.30.0
+fastapi = "^0.110.0"
+uvicorn = {extras = ["standard"], version = "^0.27.0"}
 gunicorn = "^21.2.0"
 sqlalchemy = "^2.0.20"
 alembic = "^1.12.1"
 psycopg2-binary = "^2.9.7"
 sqlalchemy-utils = "^0.41.1"
 pydantic = "^2.5.0"
-pydantic-settings = "^2.0.3"
+pydantic-settings = "^2.1.0"
 python-dotenv = "^1.0.0"
 python-jose = {extras = ["cryptography"], version = "^3.3.0"}
 passlib = {extras = ["bcrypt"], version = "^1.7.4"}
