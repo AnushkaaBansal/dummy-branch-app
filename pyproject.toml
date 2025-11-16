@@ -8,25 +8,25 @@ packages = [{include = "app"}]
 
 [tool.poetry.dependencies]
 python = "^3.9,<3.12"
-fastapi = "0.100.0"
-uvicorn = {extras = ["standard"], version = "0.23.2"}
-gunicorn = "21.2.0"
-sqlalchemy = "2.0.20"
-alembic = "1.12.1"
-psycopg2-binary = "2.9.7"
-sqlalchemy-utils = "0.41.1"
-pydantic = "1.10.13"
-pydantic-settings = "2.0.3"
-python-dotenv = "1.0.0"
-python-jose = {extras = ["cryptography"], version = "3.3.0"}
-passlib = {extras = ["bcrypt"], version = "1.7.4"}
-python-multipart = "0.0.6"
-email-validator = "2.0.0"
-python-dateutil = "2.8.2"
-pytz = "2023.3.post1"
-prometheus-fastapi-instrumentator = "6.3.0"
-structlog = "23.1.0"
-python-json-logger = "2.0.7"
+fastapi = "^0.100.0"
+uvicorn = {extras = ["standard"], version = "^0.23.2"}
+gunicorn = "^21.2.0"
+sqlalchemy = "^2.0.20"
+alembic = "^1.12.1"
+psycopg2-binary = "^2.9.7"
+sqlalchemy-utils = "^0.41.1"
+pydantic = "^2.5.0"
+pydantic-settings = "^2.0.3"
+python-dotenv = "^1.0.0"
+python-jose = {extras = ["cryptography"], version = "^3.3.0"}
+passlib = {extras = ["bcrypt"], version = "^1.7.4"}
+python-multipart = "^0.0.6"
+email-validator = "^2.0.0"
+python-dateutil = "^2.8.2"
+pytz = "^2023.3.post1"
+prometheus-fastapi-instrumentator = "^7.0.0"  # Updated to a version compatible with Python 3.11
+structlog = "^23.1.0"
+python-json-logger = "^2.0.7"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "7.4.0"
