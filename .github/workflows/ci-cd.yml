@@ -95,6 +95,10 @@ jobs:
         # Check formatting but don't fail
         black --check . || true
 
+    - name: Install test dependencies
+      run: |
+        pip install pytest pytest-cov
+
     - name: Run tests
       env:
         DATABASE_URL: ${{ env.DATABASE_URL }}
