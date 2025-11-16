@@ -12,8 +12,8 @@ env:
   DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
   DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
   REGISTRY: ghcr.io  # Using GitHub Container Registry
-  # Convert repository name to lowercase to avoid Docker tag issues
-  REPO_NAME: ${{ github.repository | lower }}
+  # Repository name in lowercase for Docker tags
+  REPO_NAME: anushkaabansal/dummy-branch-app
 
 jobs:
   test:
