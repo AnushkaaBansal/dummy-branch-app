@@ -2,62 +2,6 @@
 
 A production-ready REST API for microloans, built with FastAPI, SQLAlchemy, PostgreSQL, and Docker. This project is containerized and includes CI/CD pipelines for automated testing, building, and deployment.
 
-## 📋 Table of Contents
-- [Features](#-features)
-- [Tech Stack](#-tech-stack)
-- [Prerequisites](#-prerequisites)
-- [Quick Start](#-quick-start)
-- [Project Structure](#-project-structure)
-- [Development](#-development)
-  - [Environment Setup](#environment-setup)
-  - [Running Tests](#running-tests)
-  - [Code Style](#code-style)
-- [Deployment](#-deployment)
-  - [Environments](#environments)
-  - [CI/CD Pipeline](#cicd-pipeline)
-  - [Architecture](#architecture)
-- [API Documentation](#-api-documentation)
-- [Monitoring](#-monitoring)
-- [Troubleshooting](#-troubleshooting)
-- [License](#-license)
-
-## 🚀 Features
-
-- 🐳 **Containerized** with Docker for consistent environments
-- 🔒 **HTTPS** with self-signed certificates for secure local development
-- 🌐 **Nginx** reverse proxy with SSL termination
-- 🏗️ **Multi-environment** support (development, staging, production)
-- ⚡ **FastAPI** for high-performance API endpoints
-- 🗄️ **PostgreSQL** with persistent storage
-- 🧪 **Automated testing** with pytest
-- 🔄 **CI/CD** pipeline with GitHub Actions
-- 🔍 **Code quality** checks with flake8 and black
-- 🔒 **Security scanning** with Trivy
-- 📊 **Code coverage** reporting with Codecov
-
-## 🛠 Tech Stack
-
-- **Backend**: Python 3.11, FastAPI, SQLAlchemy, Pydantic
-- **Database**: PostgreSQL 16
-- **Web Server**: Nginx
-- **Containerization**: Docker, Docker Compose
-- **CI/CD**: GitHub Actions
-- **Testing**: pytest, pytest-cov
-- **Code Quality**: black, isort, flake8
-- **Security**: Trivy, Dependabot
-- **Monitoring**: Prometheus, Grafana 
-
-## 📋 Prerequisites
-
-- [Docker](https://www.docker.com/get-started) 20.10+
-- [Docker Compose](https://docs.docker.com/compose/install/) v2.0+
-- [Git](https://git-scm.com/)
-- [Python](https://www.python.org/downloads/) 3.11+ (for local development)
-- [OpenSSL](https://www.openssl.org/) (included with Git for Windows)
-- [Make](https://www.gnu.org/software/make/) (optional, for convenience commands)
-
-## 🚀 Quick Start
-
 ### 1. Clone the repository
 
 ```bash
@@ -126,18 +70,6 @@ Access the API at:
 └── pyproject.toml          # Python project configuration
 ```
 
-## 💻 Development
-
-### Environment Setup
-
-1. Copy the example environment file:
-
-```bash
-cp .env.example .env
-```
-
-2. Update the environment variables in `.env` as needed.
-
 ### Running the Application
 
 #### Development Mode
@@ -168,36 +100,6 @@ docker compose logs -f
 # Stop all services
 docker compose down -v
 ```
-
-### Running Tests
-
-```bash
-# Run all tests
-docker compose -f docker-compose.test.yml up --build --abort-on-container-exit
-
-# Run specific test file
-docker compose -f docker-compose.test.yml run --rm api pytest tests/test_endpoints.py -v
-
-# Run with coverage report
-docker compose -f docker-compose.test.yml run --rm api pytest --cov=app --cov-report=term-missing
-```
-
-### Code Style
-
-This project uses:
-- **black** for code formatting
-- **isort** for import sorting
-- **flake8** for linting
-
-```bash
-# Format code with black and isort
-docker compose run --rm api black .
-docker compose run --rm api isort .
-
-# Check code style
-docker compose run --rm api flake8 .
-```
-
 ## 🚀 Deployment
 
 ### Environments
@@ -208,24 +110,6 @@ docker compose run --rm api flake8 .
 | Staging | `docker-compose.staging.yml` | Staging environment (similar to production) |
 | Production | `docker-compose.prod.yml` | Production deployment with optimizations |
 
-### CI/CD Pipeline
-
-The GitHub Actions workflow includes:
-
-1. **Test**
-   - Run unit and integration tests
-   - Check code coverage
-   - Upload coverage to Codecov
-
-2. **Build**
-   - Build Docker images
-   - Cache dependencies for faster builds
-   - Scan for vulnerabilities with Trivy
-
-3. **Deploy** (on main branch or tags)
-   - Push to GitHub Container Registry
-   - Deploy to staging on push to `main`
-   - Deploy to production on new tags (v*)
 
 ### Architecture
 
@@ -250,21 +134,7 @@ graph TD
     Prometheus -->|Visualization| Grafana[Grafana]
 ```
 
-### Manual Deployment
 
-1. Build and push the Docker image:
-
-```bash
-docker build -t ghcr.io/yourusername/branch-loans-api:latest .
-docker push ghcr.io/yourusername/branch-loans-api:latest
-```
-
-2. Deploy to your infrastructure:
-
-```bash
-# Example: Deploy to Kubernetes
-kubectl apply -f k8s/
-```
 
 ## 📚 API Documentation
 
@@ -273,14 +143,7 @@ Once the application is running, access the interactive API documentation:
 - Swagger UI: https://localhost:8443/docs
 - ReDoc: https://localhost:8443/redoc
 
-## 📊 Monitoring
-## Monitoring Setup
 
-The application includes monitoring with Prometheus and Grafana:
-
-1. Start the monitoring stack:
-   ```bash
-   docker-compose -f docker-compose.yml -f docker-compose.monitoring.yml up -d
 
 ### Health Checks
 
@@ -292,24 +155,6 @@ curl -k https://localhost:8443/health
 curl -k https://localhost:8443/health/detailed
 ```
 
-### Metrics (Prometheus)
-
-```
-https://localhost:8443/metrics
-```
-
-### Logs
-
-```bash
-# View logs
-docker compose logs -f
-
-# View API logs
-docker compose logs -f api
-
-# View Nginx logs
-docker compose logs -f nginx
-```
 
 ## 🐛 Troubleshooting
 
@@ -326,50 +171,6 @@ NGINX_HTTPS_PORT=8443
 POSTGRES_PORT=5432
 ```
 
-#### 2. SSL Certificate Errors
-
-If you get SSL errors, regenerate the certificates:
-
-```bash
-rm -rf nginx/ssl/*
-./scripts/generate_ssl.sh
-```
-
-#### 3. Database Connection Issues
-
-Check if the database is running:
-
-```bash
-docker compose ps
-docker compose logs db
-```
-
-### Viewing Logs
-
-```bash
-# View all logs
-docker compose logs -f
-
-# View API logs
-docker compose logs -f api
-
-# View Nginx logs
-docker compose logs -f nginx
-
-# View database logs
-docker compose logs -f db
-```
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🙏 Acknowledgments
-
-- [FastAPI](https://fastapi.tiangolo.com/)
-- [Docker](https://www.docker.com/)
-- [PostgreSQL](https://www.postgresql.org/)
-- [Nginx](https://www.nginx.com/)
 
 ### 1. Clone the repository
 
@@ -476,26 +277,6 @@ docker-compose exec db psql -U postgres -d microloans
    ```bash
    docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
    ```
-
-## Troubleshooting
-
-### Certificate Errors
-
-If you see certificate errors in your browser:
-1. Make sure you've run the setup script as administrator
-2. Manually install the certificate by double-clicking `nginx/ssl/branchloans.crt`
-3. Select "Local Machine" and place the certificate in the "Trusted Root Certification Authorities" store
-
-### Port Conflicts
-
-If you get port conflicts (especially on Windows):
-- Stop any applications using ports 80, 443, or 5432
-- Or update the ports in `docker-compose.yml`
-
-## License
-
-MIT
-
 ### 1. Configure Local Domain
 Add the following line to your hosts file (`C:\Windows\System32\drivers\etc\hosts`):
 ```
@@ -543,78 +324,4 @@ docker compose exec api python scripts/seed.py
 | POST   | /api/loans | Create new loan |
 | GET    | /api/stats | Get loan statistics |
 
-## Development
 
-### Environment Variables
-Create a `.env` file with the following variables:
-```
-# Database
-POSTGRES_USER=postgres
-POSTGRES_PASSWORD=postgres
-POSTGRES_DB=microloans
-DATABASE_URL=postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
-
-# Application
-FLASK_ENV=development
-PORT=8000
-PYTHONPATH=/app
-
-# Nginx
-NGINX_HOST=branchloans.com
-NGINX_PORT=443
-```
-
-### Running Tests
-```bash
-docker compose exec api pytest
-```
-
-## Deployment
-
-The application is configured with GitHub Actions for CI/CD. The workflow includes:
-1. Running tests
-2. Building Docker images
-3. Scanning for vulnerabilities
-4. Pushing to container registry
-5. Deploying to production (manual trigger)
-
-## Architecture
-
-```
-┌─────────────┐     ┌─────────────┐     ┌─────────────┐
-│   Client    │ ──> │    Nginx    │ ──> │    API      │
-└─────────────┘     │  (SSL/TLS)  │     │  (Flask)    │
-                    └─────────────┘     └──────┬──────┘
-                                            │
-                                            ▼
-                                    ┌─────────────┐
-                                    │  PostgreSQL │
-                                    └─────────────┘
-```
-
-## Security
-
-- All traffic is encrypted with TLS 1.2/1.3
-- Secure headers are configured in Nginx
-- Database credentials are stored in environment variables
-- Container security best practices are followed
-
-## Troubleshooting
-
-### Certificate Warnings
-If you see certificate warnings in your browser:
-1. Open `https://branchloans.com`
-2. Click "Advanced" > "Proceed to branchloans.com (unsafe)"
-3. Install the certificate in your trusted root store
-
-### Port Conflicts
-If you encounter port conflicts (80/443), check for other services using these ports:
-```bash
-# On Windows
-netstat -ano | findstr :80
-netstat -ano | findstr :443
-```
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
