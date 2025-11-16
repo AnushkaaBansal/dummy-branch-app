@@ -97,7 +97,10 @@ jobs:
 
     - name: Install test dependencies
       run: |
+        # Install core dependencies
         pip install pytest pytest-cov fastapi uvicorn httpx sqlalchemy alembic python-multipart pydantic-settings psycopg2-binary
+        # Install test dependencies
+        pip install -r requirements-test.txt || echo "No test requirements file found"
 
     - name: Run tests
       env:
@@ -105,9 +108,9 @@ jobs:
         ENVIRONMENT: test
         PYTHONPATH: ${{ github.workspace }}
       run: |
-        # Create test database
-        python -c "from app.db import init_db; init_db()" || true
-        # Run tests
+        # Install the package in development mode
+        pip install -e .
+        # Run tests with coverage
         python -m pytest --cov=app --cov-report=xml:coverage.xml tests/ -v
 
     - name: Upload coverage to Codecov
