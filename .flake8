@@ -1,0 +1,13 @@
+[flake8]
+max-line-length = 127
+max-complexity = 10
+exclude = .git,__pycache__,.venv,venv,*.egg-info,build,dist
+per-file-ignores =
+    # Ignore flake8-annotations for now due to issues with test files
+    .venv/*: ANN
+    # Ignore line length in test files
+    tests/*: E501
+    */tests/*: E501
+    # Ignore missing docstrings in tests
+    tests/*: D100,D101,D102,D103,D104,D105,D106,D107
+    */tests/*: D100,D101,D102,D103,D104,D105,D106,D107

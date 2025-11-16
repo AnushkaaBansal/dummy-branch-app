@@ -80,15 +80,11 @@ jobs:
         pip install flake8-import-order  # For import order checking
         pip install flake8-docstrings  # For docstring checking
         pip install flake8-print  # For print statement checking
-        # Create .flake8 config file
-        echo -e '[flake8]\n\
-max-line-length = 127\n\
-max-complexity = 10\n\
-exclude = .git,__pycache__,.venv,venv,*.egg-info,build,dist\n\
-per-file-ignores =\n    # Ignore flake8-annotations for now due to issues with test files\n    .venv/*: ANN\n    # Ignore line length in test files\n    tests/*: E501\n    */tests/*: E501\n    # Ignore missing docstrings in tests\n    tests/*: D100,D101,D102,D103,D104,D105,D106,D107\n    */tests/*: D100,D101,D102,D103,D104,D105,D106,D107' > .flake8
 
     - name: Lint with flake8
       run: |
+        # Show the flake8 config being used
+        cat .flake8
         # Only fail on critical errors
         python -m flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics || true
         # Run full linting but don't fail the build
