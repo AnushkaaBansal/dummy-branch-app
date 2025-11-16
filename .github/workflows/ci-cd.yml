@@ -97,13 +97,17 @@ jobs:
 
     - name: Install test dependencies
       run: |
-        pip install pytest pytest-cov fastapi uvicorn httpx sqlalchemy alembic python-multipart pydantic-settings
+        pip install pytest pytest-cov fastapi uvicorn httpx sqlalchemy alembic python-multipart pydantic-settings psycopg2-binary
 
     - name: Run tests
       env:
         DATABASE_URL: ${{ env.DATABASE_URL }}
         ENVIRONMENT: test
+        PYTHONPATH: ${{ github.workspace }}
       run: |
+        # Create test database
+        python -c "from app.db import init_db; init_db()" || true
+        # Run tests
         python -m pytest --cov=app --cov-report=xml:coverage.xml tests/ -v
 
     - name: Upload coverage to Codecov
