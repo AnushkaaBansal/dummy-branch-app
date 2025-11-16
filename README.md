@@ -45,7 +45,7 @@ A production-ready REST API for microloans, built with FastAPI, SQLAlchemy, Post
 - **Testing**: pytest, pytest-cov
 - **Code Quality**: black, isort, flake8
 - **Security**: Trivy, Dependabot
-- **Monitoring**: Prometheus, Grafana (optional)
+- **Monitoring**: Prometheus, Grafana 
 
 ## 📋 Prerequisites
 
@@ -270,25 +270,32 @@ kubectl apply -f k8s/
 
 Once the application is running, access the interactive API documentation:
 
-- Swagger UI: https://branchloans.com:8080/docs
-- ReDoc: https://branchloans.com:8080/redoc
+- Swagger UI: https://localhost:8443/docs
+- ReDoc: https://localhost:8443/redoc
 
 ## 📊 Monitoring
+## Monitoring Setup
+
+The application includes monitoring with Prometheus and Grafana:
+
+1. Start the monitoring stack:
+   ```bash
+   docker-compose -f docker-compose.yml -f docker-compose.monitoring.yml up -d
 
 ### Health Checks
 
 ```bash
 # Basic health check
-curl -k https://localhost:8080/health
+curl -k https://localhost:8443/health
 
 # Detailed health check
-curl -k https://localhost:8080/health/detailed
+curl -k https://localhost:8443/health/detailed
 ```
 
 ### Metrics (Prometheus)
 
 ```
-http://localhost:8080/metrics
+https://localhost:8443/metrics
 ```
 
 ### Logs
