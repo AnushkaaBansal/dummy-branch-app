@@ -65,7 +65,12 @@ jobs:
 
     - name: Install dependencies
       run: |
-        poetry install --with dev --no-interaction
+        # First install pydantic v2 and compatible pydantic-settings
+        pip install "pydantic>=2.0.0" "pydantic-settings>=2.0.0"
+        # Then install the rest of the dependencies
+        poetry install --with dev --no-interaction --no-root
+        # Finally install the package in development mode
+        poetry install --no-interaction
 
     - name: Lint with flake8
       run: |
