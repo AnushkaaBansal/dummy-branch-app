@@ -37,7 +37,7 @@ def mock_db(monkeypatch):
 def test_health_check(mock_db):
     """Test the health check endpoint."""
     client = TestClient(app)
-    response = client.get("/health")
+    response = client.get("/api/health")
     
     assert response.status_code == 200
     data = response.json()
@@ -48,13 +48,13 @@ def test_health_check(mock_db):
 def test_liveness_probe():
     """Test the liveness probe endpoint."""
     client = TestClient(app)
-    response = client.get("/health/live")
+    response = client.get("/api/health/live")
     assert response.status_code == 200
     assert response.json() == {"status": "alive"}
 
 def test_readiness_probe(mock_db):
     """Test the readiness probe endpoint."""
     client = TestClient(app)
-    response = client.get("/health/ready")
+    response = client.get("/api/health/ready")
     assert response.status_code == 200
     assert response.json() == {"status": "ready"}
