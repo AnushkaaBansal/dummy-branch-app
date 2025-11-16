@@ -41,20 +41,21 @@ def test_health_check(mock_db):
     
     assert response.status_code == 200
     data = response.json()
-    assert data["status"] == "ok"
-    assert "db" in data
+    assert data["status"] == "healthy"
+    assert "checks" in data
+    assert "database" in data["checks"]
     assert "version" in data
 
 def test_liveness_probe():
     """Test the liveness probe endpoint."""
     client = TestClient(app)
-    response = client.get("/api/health/live")
+    response = client.get("/api/health/liveness")
     assert response.status_code == 200
     assert response.json() == {"status": "alive"}
 
 def test_readiness_probe(mock_db):
     """Test the readiness probe endpoint."""
     client = TestClient(app)
-    response = client.get("/api/health/ready")
+    response = client.get("/api/health/readiness")
     assert response.status_code == 200
     assert response.json() == {"status": "ready"}

@@ -40,14 +40,29 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
-        pip install "pytest>=7.0.0" "pytest-cov>=4.0.0" "httpx<0.24.0" "pytest-mock>=3.10.0" "python-dotenv>=0.21.0" "starlette>=0.21.0,<1.0.0"
+        pip install "pytest>=7.0.0" "pytest-cov>=4.0.0" "httpx<0.24.0" "pytest-mock>=3.10.0" "python-dotenv>=0.21.0" "starlette>=0.21.0,<1.0.0" "sqlalchemy>=1.4.0" "alembic"
+        
+        # Install test dependencies
+        pip install -e .[test]  # If you have test dependencies in setup.py
+        
+        # Verify installations
+        python -c "import pytest; print(f'pytest version: {pytest.__version__}')"
+        python -c "import sqlalchemy; print(f'SQLAlchemy version: {sqlalchemy.__version__}')"
 
     - name: Run tests
       env:
         DATABASE_URL: ${{ env.DATABASE_URL }}
         ENVIRONMENT: test
+        PYTHONPATH: ${{ github.workspace }}
       run: |
-        python -m pytest tests/ -v
+        # Run tests with coverage
+        python -m pytest tests/ -v --cov=app --cov-report=xml
+        
+        # Show test coverage
+        python -m coverage report
+        
+        # Fail if test coverage is below 70%
+        python -m coverage report --fail-under=70
 
     - name: Install linting tools
       run: |
