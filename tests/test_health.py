@@ -9,21 +9,30 @@ from pathlib import Path
 sys.path.append(str(Path(__file__).parent.parent))
 
 from app.main import app
+from app.db import SessionFactory, get_db
 from sqlalchemy.orm import Session
 
 # Mock the database connection for all tests
 @pytest.fixture(autouse=True)
-def mock_db():
-    with patch('app.db.SessionLocal') as mock_session_local:
-        # Create a mock session
-        mock_session = MagicMock(spec=Session)
-        mock_session.execute.return_value = MagicMock(scalar=MagicMock(return_value=1))
-        mock_session_local.return_value = mock_session
-        # Ensure the app can import the db module
-        import sys
-        from pathlib import Path
-        sys.path.append(str(Path(__file__).parent.parent))
-        yield mock_session
+def mock_db(monkeypatch):
+    # Create a mock session
+    mock_session = MagicMock(spec=Session)
+    mock_session.execute.return_value = MagicMock(scalar=MagicMock(return_value=1))
+    
+    # Create a mock session factory
+    mock_session_factory = MagicMock()
+    mock_session_factory.return_value = mock_session
+    
+    # Patch the SessionFactory
+    monkeypatch.setattr('app.db.SessionFactory', mock_session_factory)
+    
+    # Patch the get_db dependency
+    def mock_get_db():
+        return mock_session
+        
+    monkeypatch.setattr('app.db.get_db', mock_get_db)
+    
+    yield mock_session
 
 def test_health_check(mock_db):
     """Test the health check endpoint."""
