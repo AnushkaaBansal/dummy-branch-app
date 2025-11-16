@@ -72,12 +72,22 @@ jobs:
         # Finally install the package in development mode
         poetry install --no-interaction
 
+    - name: Install linting tools
+      run: |
+        pip install flake8 black
+        pip install flake8-black  # For black integration with flake8
+        pip install flake8-bugbear  # For additional linting rules
+        pip install flake8-import-order  # For import order checking
+        pip install flake8-annotations  # For type annotation checking
+        pip install flake8-docstrings  # For docstring checking
+        pip install flake8-print  # For print statement checking
+
     - name: Lint with flake8
       run: |
         # Only fail on critical errors
-        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics --max-line-length=127 || true
+        python -m flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics --max-line-length=127 || true
         # Run full linting but don't fail the build
-        flake8 . --count --max-complexity=10 --max-line-length=127 --statistics --exit-zero
+        python -m flake8 . --count --max-complexity=10 --max-line-length=127 --statistics --exit-zero
 
     - name: Format with black
       run: |
