@@ -12,6 +12,8 @@ env:
   DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
   DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
   REGISTRY: ghcr.io  # Using GitHub Container Registry
+  # Convert repository name to lowercase to avoid Docker tag issues
+  REPO_NAME: ${{ github.repository | lower }}
 
 jobs:
   test:
@@ -56,7 +58,7 @@ jobs:
   build:
     name: Build and Push
     needs: test
-    if: github.event_name == 'push'  # Only run on push to main, not on PRs
+    if: github.ref == 'refs/heads/main'  # Only run on push to main, not on PRs
     runs-on: ubuntu-latest
     
     steps:
@@ -78,8 +80,8 @@ jobs:
         context: .
         push: true
         tags: |
-          ${{ env.REGISTRY }}/${{ github.repository }}/${{ env.DOCKER_IMAGE }}:latest
-          ${{ env.REGISTRY }}/${{ github.repository }}/${{ env.DOCKER_IMAGE }}:${{ github.sha }}
+          ${{ env.REGISTRY }}/${{ env.REPO_NAME }}/${{ env.DOCKER_IMAGE }}:latest
+          ${{ env.REGISTRY }}/${{ env.REPO_NAME }}/${{ env.DOCKER_IMAGE }}:${{ github.sha }}
 
   deploy-staging:
     name: Deploy to Staging
@@ -105,7 +107,7 @@ jobs:
     - name: Run Trivy vulnerability scanner
       uses: aquasecurity/trivy-action@master
       with:
-        image-ref: '${{ env.REGISTRY }}/${{ github.repository }}/${{ env.DOCKER_IMAGE }}:latest'
+        image-ref: '${{ env.REGISTRY }}/${{ env.REPO_NAME }}/${{ env.DOCKER_IMAGE }}:latest'
         format: 'table'
         exit-code: '1'
         ignore-unfixed: true
