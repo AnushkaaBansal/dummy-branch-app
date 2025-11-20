@@ -46,7 +46,7 @@ To stop:
 docker compose down -v
 ```
 
-## 🏗 Project Structure
+## Project Structure
 
 ```
 .
@@ -91,14 +91,12 @@ docker compose logs -f
 docker compose down
 ```
 
-## 📚 API Documentation
+## API Documentation
 
 Once the application is running, access the interactive API documentation:
 
 - Swagger UI: https://localhost:8443/docs
 - ReDoc: https://localhost:8443/redoc
-
-
 
 ### Health Checks
 
@@ -110,12 +108,7 @@ curl -k https://localhost:8443/health
 curl -k https://localhost:8443/health/detailed
 ```
 
-
-## 🐛 Troubleshooting
-
-### Common Issues
-
-#### 1. Port Conflicts
+###  Port Conflicts
 
 If you get port conflicts, update the ports in `.env`:
 
@@ -124,32 +117,6 @@ API_PORT=8000
 NGINX_HTTP_PORT=8080
 NGINX_HTTPS_PORT=8443
 POSTGRES_PORT=5432
-```
-
-### 4. Access the application
-
-- API: https://branchloans.com
-- Health Check: https://branchloans.com/health
-- API Documentation: https://branchloans.com/docs
-
-> **Note**: You might see a security warning because of the self-signed certificate. You can safely proceed by accepting the certificate in your browser.
-
-
-
-## Environment Variables
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `DATABASE_URL` | PostgreSQL connection URL | `postgresql+psycopg2://postgres:postgres@db:5432/microloans` |
-| `PORT` | Application port | `8000` |
-| `CORS_ORIGINS` | Allowed CORS origins | `["https://branchloans.com"]` |
-
-## Development
-
-### Running the development server
-
-```bash
-docker-compose up --build
 ```
 
 ### Running tests
@@ -173,13 +140,13 @@ docker-compose exec db psql -U postgres -d microloans
    ```bash
    docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
    ```
-### 1. Configure Local Domain
+Configure Local Domain
 Add the following line to your hosts file (`C:\Windows\System32\drivers\etc\hosts`):
 ```
 127.0.0.1   branchloans.com www.branchloans.com
 ```
 
-### 2. Generate SSL Certificates
+## Generate SSL Certificates
 Run the following command to generate self-signed SSL certificates:
 ```bash
 # On Windows (PowerShell as Administrator):
@@ -190,25 +157,17 @@ chmod +x nginx/ssl/generate_ssl.sh
 ./nginx/ssl/generate_ssl.sh
 ```
 
-### 3. Build and Start Services
-```bash
-docker compose up -d --build
-```
-
-### 4. Run Database Migrations
+###  Run Database Migrations
 ```bash
 docker compose exec api alembic upgrade head
 ```
 
-### 5. Seed Dummy Data (Optional)
+###  Seed Dummy Data (Optional)
 ```bash
 docker compose exec api python scripts/seed.py
 ```
 
-### 6. Access the API
-- API: https://branchloans.com
-- Health Check: https://branchloans.com/health
-- API Docs: https://branchloans.com/api/docs
+
 
 
 
