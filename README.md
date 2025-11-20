@@ -1,7 +1,5 @@
 # Branch Loans API
 
-A production-ready REST API for microloans, built with FastAPI, SQLAlchemy, PostgreSQL, and Docker. This project is containerized and includes CI/CD pipelines for automated testing, building, and deployment.
-
 ### 1. Clone the repository
 
 ```bash
@@ -9,15 +7,15 @@ git clone https://github.com/yourusername/branch-loans-api.git
 cd branch-loans-api
 ```
 
-### 2. Set up environment
+### 2. First-time setup
 
-#### Windows
+#### Windows (Powershell, Run as Administrator)
 
 ```powershell
-# Run PowerShell as Administrator
 Set-ExecutionPolicy Bypass -Scope Process -Force
-.\scripts\setup.ps1
+.\setup_ssl_and_hosts.ps1
 ```
+This will generate .key, .crt, .pem files in nginx/ssl/branchloans
 
 #### Linux/macOS
 
@@ -29,29 +27,30 @@ chmod +x ./scripts/setup.sh
 ./scripts/setup.sh
 ```
 
-This will:
-- Generate SSL certificates
-- Configure local hosts file
-- Set up required environment variables
-
-### 3. Start the application
+### 3. Running (Development)
 
 ```bash
-# Start in development mode
-docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build
-```
+docker compose up -d --build
+docker compose  exec api alembic upgrade head 
 
-Access the API at:
-- API: https://branchloans.com:8080
-- API Docs: https://branchloans.com:8080/docs
-- Health Check: https://branchloans.com:8080/health
+Access
+- Health: `https://branchloans.com:8443/health`
+- API Docs: `https://branchloans.com:8443/docs`
+- Prometheus: `https://localhost:9090` (this will run only when docker-compose.monitoring.yml is implemented)
+- Grafana: `https://localhost:3000`  (default: username and password, both are admin, admin)
+
+To stop: 
+```
+bash
+docker compose down -v
+```
 
 ## 🏗 Project Structure
 
 ```
 .
 ├── .github/                # GitHub workflows and templates
-│   └── workflows/          # CI/CD pipelines
+│   └── workflows/        # CI/CD pipelines
 ├── app/                    # Application code
 │   ├── api/                # API endpoints
 │   ├── core/               # Core functionality
