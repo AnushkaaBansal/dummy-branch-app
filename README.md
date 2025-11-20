@@ -39,10 +39,10 @@ Access
 - Prometheus: `https://localhost:9090` (this will run only when docker-compose.monitoring.yml is implemented)
 - Grafana: `https://localhost:3000`  (default: username and password, both are admin, admin)
 
-```
+
 To stop: 
 
-bash
+```bash
 docker compose down -v
 ```
 
@@ -64,7 +64,7 @@ docker compose down -v
 ```
 
 # Running the Application
-```
+```bash
 docker-compose up --build
 docker compose -f docker-compose.yml -f docker-compose.override.yml up --build
 docker compose -f docker-compose.yml -f docker-compose.prod.yml up --build
@@ -74,7 +74,7 @@ docker compose -f docker-compose.yml -f docker-compose.monitoring.yml up --build
 
 
 # Run in detached mode
-```
+```bash
 docker compose -f docker-compose.yml -f docker-compose.override.yml up -d
 docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
 docker compose -f docker-compose.yml -f docker-compose.staging.yml up -d
@@ -82,40 +82,14 @@ docker compose -f docker-compose.yml -f docker-compose.monitoring.yml up -d
 ```
 
 # View logs
-```
+```bash
 docker compose logs -f
 ```
 
 # Stop all services
-```
+```bash
 docker compose down
 ```
-
-
-### Architecture
-
-For a detailed architecture overview, see [ARCHITECTURE.md](ARCHITECTURE.md).
-
-The system consists of the following components:
-
-- **Nginx**: Reverse proxy with SSL termination
-- **FastAPI**: Python API service
-- **PostgreSQL**: Primary database
-- **Redis**: Caching and rate limiting
-- **Prometheus**: Metrics collection
-- **Grafana**: Monitoring dashboards
-
-```mermaid
-graph TD
-    Client[Client] -->|HTTPS| Nginx[Nginx]
-    Nginx -->|HTTP| API[FastAPI]
-    API -->|Connection| DB[(PostgreSQL)]
-    API -->|Cache| Redis[(Redis)]
-    API -->|Metrics| Prometheus[Prometheus]
-    Prometheus -->|Visualization| Grafana[Grafana]
-```
-
-
 
 ## 📚 API Documentation
 
