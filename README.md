@@ -39,8 +39,9 @@ Access
 - Prometheus: `https://localhost:9090` (this will run only when docker-compose.monitoring.yml is implemented)
 - Grafana: `https://localhost:3000`  (default: username and password, both are admin, admin)
 
-To stop: 
 ```
+To stop: 
+
 bash
 docker compose down -v
 ```
@@ -49,65 +50,46 @@ docker compose down -v
 
 ```
 .
-├── .github/                # GitHub workflows and templates
-│   └── workflows/        # CI/CD pipelines
-├── app/                    # Application code
-│   ├── api/                # API endpoints
-│   ├── core/               # Core functionality
-│   ├── db/                 # Database models and migrations
-│   ├── schemas/            # Pydantic models
-│   └── services/           # Business logic
-├── nginx/                  # Nginx configuration
-│   ├── conf.d/             # Nginx server configurations
-│   └── ssl/                # SSL certificates
-├── scripts/                # Utility scripts
-├── tests/                  # Test suite
-├── .env.example            # Example environment variables
-├── docker-compose.yml      # Base Docker Compose config
-├── docker-compose.dev.yml  # Development overrides
-├── docker-compose.prod.yml # Production overrides
-└── pyproject.toml          # Python project configuration
+├── .github/                          # GitHub workflows and templates
+│   └── workflows/ci-cd.yaml          # CI/CD pipelines
+├── app/                              # Application code
+├── nginx/                            # Nginx configuration
+├── scripts/                          # Utility scripts
+├── tests/                            # Test suite
+├── docker-compose.staging.yml        # Stagging overrides
+├── docker-compose.monitoring.yml     # Prometheus + Grafana add-on
+├── docker-compose.override.yml       # Development overrides
+├── docker-compose.prod.yml           # Production overrides
+└── docker-compose.yml                # Base Docker Compose Config 
 ```
 
-### Running the Application
+# Running the Application
+```
+docker-compose up --build
+docker compose -f docker-compose.yml -f docker-compose.override.yml up --build
+docker compose -f docker-compose.yml -f docker-compose.prod.yml up --build
+docker compose -f docker-compose.yml -f docker-compose.staging.yml up --build
+docker compose -f docker-compose.yml -f docker-compose.monitoring.yml up --build
+```
 
-#### Development Mode
-
-```bash
-# Start all services
-docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build
 
 # Run in detached mode
-docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d
+```
+docker compose -f docker-compose.yml -f docker-compose.override.yml up -d
+docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+docker compose -f docker-compose.yml -f docker-compose.staging.yml up -d
+docker compose -f docker-compose.yml -f docker-compose.monitoring.yml up -d
+```
 
 # View logs
+```
 docker compose logs -f
+```
 
 # Stop all services
+```
 docker compose down
 ```
-
-#### Production Mode
-
-```bash
-# Build and start in production mode
-docker compose -f docker-compose.yml -f docker-compose.prod.yml up --build -d
-
-# View logs
-docker compose logs -f
-
-# Stop all services
-docker compose down -v
-```
-## 🚀 Deployment
-
-### Environments
-
-| Environment | File | Description |
-|-------------|------|-------------|
-| Development | `docker-compose.dev.yml` | Local development with hot-reload |
-| Staging | `docker-compose.staging.yml` | Staging environment (similar to production) |
-| Production | `docker-compose.prod.yml` | Production deployment with optimizations |
 
 
 ### Architecture
@@ -170,37 +152,6 @@ NGINX_HTTPS_PORT=8443
 POSTGRES_PORT=5432
 ```
 
-
-### 1. Clone the repository
-
-```bash
-git clone https://github.com/yourusername/branch-loans-api.git
-cd branch-loans-api
-```
-
-### 2. Set up SSL certificates and hosts file (Windows)
-
-Run the setup script as administrator:
-
-```powershell
-# In PowerShell (Run as Administrator)
-Set-ExecutionPolicy Bypass -Scope Process -Force
-.\setup_ssl_and_hosts.ps1
-```
-
-For Linux/macOS, you'll need to manually:
-1. Generate SSL certificates using the script in `nginx/ssl/generate_ssl.sh`
-2. Add the following to your `/etc/hosts` file:
-   ```
-   127.0.0.1    branchloans.com www.branchloans.com
-   ```
-
-### 3. Start the application
-
-```bash
-docker-compose up --build -d
-```
-
 ### 4. Access the application
 
 - API: https://branchloans.com
@@ -209,35 +160,7 @@ docker-compose up --build -d
 
 > **Note**: You might see a security warning because of the self-signed certificate. You can safely proceed by accepting the certificate in your browser.
 
-## Project Structure
 
-```
-.
-├── app/                    # Application source code
-│   ├── __init__.py         # Application factory
-│   ├── main.py             # Main application module
-│   ├── config.py           # Configuration settings
-│   ├── db.py               # Database configuration
-│   ├── models/             # Database models
-│   ├── routes/             # API routes
-│   └── schemas.py          # Pydantic schemas
-├── nginx/                  # Nginx configuration
-│   ├── nginx.conf          # Nginx configuration
-│   └── ssl/                # SSL certificates
-├── tests/                  # Test files
-├── .env.example           # Example environment variables
-├── docker-compose.yml     # Docker Compose configuration
-├── Dockerfile             # Application Dockerfile
-└── requirements.txt       # Python dependencies
-```
-
-## Available Endpoints
-
-- `GET /health` - Health check endpoint
-- `GET /api/loans` - List all loans
-- `GET /api/loans/{id}` - Get specific loan details
-- `POST /api/loans` - Create new loan application
-- `GET /api/stats` - Get loan statistics
 
 ## Environment Variables
 
@@ -313,14 +236,6 @@ docker compose exec api python scripts/seed.py
 - Health Check: https://branchloans.com/health
 - API Docs: https://branchloans.com/api/docs
 
-## API Endpoints
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET    | /health | Health check |
-| GET    | /api/loans | List all loans |
-| GET    | /api/loans/:id | Get loan details |
-| POST   | /api/loans | Create new loan |
-| GET    | /api/stats | Get loan statistics |
 
 
